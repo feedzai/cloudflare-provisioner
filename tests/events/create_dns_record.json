@@ -1,0 +1,19 @@
+{
+    "RequestType": "Create",
+    "ResponseURL": "http://pre-signed-S3-url-for-response",
+    "StackId": "arn:aws:cloudformation:us-west-2:123456789012:stack/stack-name/guid",
+    "RequestId": "unique id for this create request",
+    "ResourceType": "Custom::CloudflareDnsRecord",
+    "PhysicalResourceId": "b2d6151242d31b39c9e19550e72d2",
+    "LogicalResourceId": "ExampleDnsRecord",
+    "ResourceProperties": {
+        "Name": "test.example.org",
+        "Type": "CNAME",
+        "Content": "alb-123456789.eu-west-1.elb.amazonaws.com",
+        "Ttl": "600",
+        "ZoneId": "8059d39ea71c44813c40008d479856e4",
+        "Comment": "A test record",
+        "Priority": 10,
+        "Proxied": false
+    }
+}

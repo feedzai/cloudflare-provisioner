@@ -1,0 +1,19 @@
+service: cloudflare-provisioner
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-python-requirements
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: eu-west-1
+  stage: prod
+  environment:
+    CLOUDFLARE_API_TOKEN: ${ssm:/aws/reference/secretsmanager/solutions/cloudflare/api-token}
+
+functions:
+  cloudflare-dns-record:
+    handler: cloudflare_provisioner.dns_record.handler
+    description: Manages Cloudflare DNS records
