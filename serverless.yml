@@ -10,10 +10,40 @@ provider:
   runtime: python3.8
   region: eu-west-1
   stage: prod
+  iam:
+    role:
+      name: cloudflare-provisioner-execution-role-${sls:stage}
   environment:
-    CLOUDFLARE_API_TOKEN: ${ssm:/aws/reference/secretsmanager/solutions/cloudflare/api-token}
+    CLOUDFLARE_API_TOKEN_SECRET_NAME: solutions/cloudflare/api-token-${sls:stage}
 
 functions:
   cloudflare-dns-record:
     handler: cloudflare_provisioner.dns_record.handler
     description: Manages Cloudflare DNS records
+    layers:
+      - arn:aws:lambda:eu-west-1:015030872274:layer:AWS-Parameters-and-Secrets-Lambda-Extension:4
+
+resources:
+  Resources:
+    CloudflareApiTokenSecret:
+      Type: AWS::SecretsManager::Secret
+      Properties:
+        Description: API Token used to provision Cloudflare resources
+        Name: solutions/cloudflare/api-token-${sls:stage}
+        Tags:
+          - Key: Project
+            Value: cloudflare-provisioner
+    CloudflareApiTokenSecretPolicy:
+      Type: AWS::SecretsManager::ResourcePolicy
+      Properties:
+        SecretId: !Ref CloudflareApiTokenSecret
+        ResourcePolicy:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+                - secretsmanager:DescribeSecret
+              Resource: '*'
+              Principal:
+                AWS: !GetAtt [ IamRoleLambdaExecution, Arn]
